@@ -6,15 +6,11 @@ def lcm(a, b):
     return (a * b) // gcd(a, b)
 
 
-def gowno(a, b):
-    return lcm(a, b)
-
-
 def lcm_multiple(numbers):
     return reduce(lcm, numbers)
 
 
-def find_cycle_length(start_room, room_graph, door_sequence, target_rooms):
+def find_cycle_length(start_room, rooms, door_sequence, target_rooms):
     visited = {}
     target_visited = {}
     room = start_room
@@ -22,28 +18,44 @@ def find_cycle_length(start_room, room_graph, door_sequence, target_rooms):
     iterations = 0
     sequence_length = len(door_sequence)
 
+    print(f"\nStarting simulation for room {start_room}...")
+
     while (room, step % sequence_length) not in visited:
         visited[(room, step % sequence_length)] = step
         door = door_sequence[step % sequence_length]
-        room = room_graph.get(room, {}).get(door, room)  # Ensure valid room transition
+        room = rooms.get(room, {}).get(door, room)
+
         if (step % sequence_length) == 0:
             iterations += 1
-            print(start_room, "iterations", iterations, "steps", step)
+
+        step += 1
 
         for target in target_rooms:
             if room == target:
-                print(start_room, "target", target, "room", room, "steps", step)
-                target_visited[(room, step % sequence_length)] = step
-        step += 1
+                print(
+                    f"Child {start_room} reached target {target} at step {step} (iteration {iterations})"
+                )
+                target_visited[(room, step % sequence_length)] = iterations
 
+    first_target = min(target_visited.values())
     cycle_length = step - visited[(room, step % sequence_length)]
-    print(target_visited)
-    print(cycle_length)
+
+    print(
+        f"Cycles length = {cycle_length} Iterations = {iterations} First target steps = {first_target}"
+    )
+    print(f"Targets visited: {target_visited}")
     print("\n")
-    return cycle_length
+
+    return cycle_length, first_target
 
 
 def main(input_file):
+
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
 
     with open(input_file, "r") as f:
         lines = f.readlines()
@@ -54,24 +66,32 @@ def main(input_file):
     target_rooms = list(map(int, lines[3].strip().split()))
     door_sequence = lines[4].strip()
 
-    room_graph = {}
+    rooms = {}
     for i in range(num_rooms):
-        connections = list(map(int, lines[5 + i].strip().split()))
-        room_graph[i + 1] = {
-            "A": connections[0],
-            "B": connections[1],
-            "C": connections[2],
-            "D": connections[3],
+        doors = list(map(int, lines[5 + i].strip().split()))
+        rooms[i + 1] = {
+            "A": doors[0],
+            "B": doors[1],
+            "C": doors[2],
+            "D": doors[3],
         }
 
-    cycle_lengths = [
-        find_cycle_length(room, room_graph, door_sequence, target_rooms)
+    results = [
+        find_cycle_length(room, rooms, door_sequence, target_rooms)
         for room in initial_rooms
     ]
-    synchronization_step = lcm_multiple(cycle_lengths)
-    print("Steps to synchronize:", synchronization_step)
+
+    cycle_lengths, first_targets = zip(*results)
+
+    print(f"First target room steps: {first_targets}")
+
+    finish_steps = lcm_multiple(cycle_lengths)
+    fmt_nmbr = f"{finish_steps:,}".replace(",", " ")
+    print("Steps to finish:", fmt_nmbr)
+
+    return finish_steps
 
 
 if __name__ == "__main__":
-    input_file = "rooms_input2.txt"  # Replace with your actual file name
+    input_file = "12.in"
     main(input_file)
