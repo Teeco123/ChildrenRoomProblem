@@ -1,52 +1,18 @@
-from math import gcd
-from functools import reduce
+def find_room(rooms, door_sequence, target_rooms):
+    target_room = 681
+    i = 0
+    while i < 5:
+        for room, doors in rooms.items():
+            for (
+                letter,
+                next_room,
+            ) in doors.items():
+                if next_room == target_room:
+                    print("U can get to: ", target_room, " from", room, " via", letter)
+                    target_room = room
+                    i += 1
 
-
-def lcm(a, b):
-    return (a * b) // gcd(a, b)
-
-
-def lcm_multiple(numbers):
-    return reduce(lcm, numbers)
-
-
-def find_cycle_length(start_room, rooms, door_sequence, target_rooms):
-    visited = {}
-    target_visited = {}
-    room = start_room
-    step = 0
-    iterations = 0
-    sequence_length = len(door_sequence)
-
-    print(f"\nStarting simulation for room {start_room}...")
-
-    while (room, step % sequence_length) not in visited:
-        visited[(room, step % sequence_length)] = step
-        door = door_sequence[step % sequence_length]
-        room = rooms.get(room, {}).get(door, room)
-
-        if (step % sequence_length) == 0:
-            iterations += 1
-
-        step += 1
-
-        for target in target_rooms:
-            if room == target:
-                print(
-                    f"Child {start_room} reached target {target} at step {step} (iteration {iterations})"
-                )
-                target_visited[(room, step % sequence_length)] = iterations
-
-    first_target = min(target_visited.values())
-    cycle_length = step - visited[(room, step % sequence_length)]
-
-    print(
-        f"Cycles length = {cycle_length} Iterations = {iterations} First target steps = {first_target}"
-    )
-    print(f"Targets visited: {target_visited}")
-    print("\n")
-
-    return cycle_length, first_target
+    return 0
 
 
 def main(input_file):
@@ -76,22 +42,11 @@ def main(input_file):
             "D": doors[3],
         }
 
-    results = [
-        find_cycle_length(room, rooms, door_sequence, target_rooms)
-        for room in initial_rooms
-    ]
+    find_room(rooms, door_sequence, target_rooms)
 
-    cycle_lengths, first_targets = zip(*results)
-
-    print(f"First target room steps: {first_targets}")
-
-    finish_steps = lcm_multiple(cycle_lengths)
-    fmt_nmbr = f"{finish_steps:,}".replace(",", " ")
-    print("Steps to finish:", fmt_nmbr)
-
-    return finish_steps
+    return 0
 
 
 if __name__ == "__main__":
-    input_file = "12.in"
+    input_file = "test_04.in"
     main(input_file)
