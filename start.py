@@ -1,17 +1,17 @@
-def find_room(rooms, door_sequence, target_rooms):
+def find_room(rooms):
     target_room = 681
-    i = 0
-    while i < 5:
-        for room, doors in rooms.items():
-            for (
-                letter,
-                next_room,
-            ) in doors.items():
-                if next_room == target_room:
-                    print("U can get to: ", target_room, " from", room, " via", letter)
-                    target_room = room
-                    i += 1
+    matches = 0
 
+    # Sprawdza kazdy pokoj
+    for room, doors in rooms.items():
+        # Sprawdza kazde drzwi oraz ich nastepny pokoj
+        for letter, next_room in doors.items():
+            if next_room == target_room:
+                print("U can get to: ", target_room, " from", room, " via", letter)
+                matches += 1
+            if matches == 2:
+                print("Two doors lead to", target_room, "from room", room)
+                return 0
     return 0
 
 
@@ -42,7 +42,7 @@ def main(input_file):
             "D": doors[3],
         }
 
-    find_room(rooms, door_sequence, target_rooms)
+    find_room(rooms)
 
     return 0
 
